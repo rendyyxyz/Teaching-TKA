@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Akses Terbatas — Persiapan TKA SMA 2026</title>
+<style>
+  :root { --green:#0b6b52; --green-dark:#085041; --ink:#16241f; --muted:#5b6b66; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center;
+         font-family:Georgia,'Times New Roman',serif; color:var(--ink);
+         background:radial-gradient(circle at 30% 20%, #0e7d5f 0%, #085041 45%, #06382d 100%);
+         padding:24px; }
+  .card { width:100%; max-width:420px; background:#fbfaf6; border-radius:16px;
+          padding:34px 30px; box-shadow:0 24px 60px rgba(0,0,0,.35); }
+  h1 { margin:0 0 6px; font-size:1.5rem; letter-spacing:.2px; }
+  .sub { margin:0 0 24px; color:var(--muted); font-size:.9rem; line-height:1.5; }
+  label { display:block; font-size:.78rem; font-weight:700; text-transform:uppercase;
+          letter-spacing:.06em; color:var(--muted); margin-bottom:7px; }
+  input { width:100%; padding:13px 14px; font-size:1rem; font-family:inherit;
+          border:2px solid #d7ddd9; border-radius:10px; background:#fff; color:var(--ink); }
+  input:focus { outline:none; border-color:var(--green); }
+  button { width:100%; margin-top:16px; padding:13px; font-size:1rem; font-weight:700;
+           font-family:inherit; color:#fff; background:var(--green); border:0;
+           border-radius:10px; cursor:pointer; transition:.15s; }
+  button:hover:not(:disabled) { background:var(--green-dark); }
+  button:disabled { opacity:.6; cursor:progress; }
+  .msg { margin-top:14px; font-size:.86rem; line-height:1.45; min-height:1.2em; }
+  .msg.err { color:#b3261e; }
+  .msg.ok { color:var(--green); }
+  .foot { margin-top:22px; padding-top:16px; border-top:1px solid #e6e8e4;
+          font-size:.74rem; color:var(--muted); line-height:1.5; }
+</style>
+</head>
+<body>
+<form class="card" id="f" autocomplete="off">
+  <h1>Persiapan TKA SMA 2026</h1>
+  <p class="sub">Fisika, Matematika, Bahasa Inggris, Bahasa Indonesia. Masukkan kata sandi untuk membuka.</p>
+  <label for="pw">Kata sandi</label>
+  <input id="pw" type="password" autocomplete="current-password" autofocus required>
+  <button id="go" type="submit">Buka</button>
+  <p class="msg" id="m"></p>
+  <div class="foot">
+    Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-256-GCM).
+    Tanpa kata sandi, berkasnya tidak dapat dibaca.
+  </div>
+</form>
+<script>
+(function () {
+  'use strict';
+  var form = document.getElementById('f');
+  var pw = document.getElementById('pw');
+  var btn = document.getElementById('go');
+  var msg = document.getElementById('m');
+  var cfg = null;
+
+  function say(t, c) { msg.textContent = t; msg.className = 'msg ' + (c || ''); }
+  function b64(buf) {
+    var b = new Uint8Array(buf), s = '';
+    for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+    return btoa(s);
+  }
+  function unb64(str) {
+    var raw = atob(str), out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function concat(a, b) {
+    var out = new Uint8Array(a.length + b.length);
+    out.set(a, 0); out.set(b, a.length);
+    return out;
+  }
+  async function deriveKeys(password, salt, iterations) {
+    var base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password),
+                                             'PBKDF2', false, ['deriveBits']);
+    var encBits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' }, base, 256);
+    var nameSalt = new Uint8Array(salt.length + 5);
+    nameSalt.set(salt, 0);
+    nameSalt.set(new TextEncoder().encode('names'), salt.length);
+    var nameBits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt: nameSalt, iterations: iterations, hash: 'SHA-256' }, base, 256);
+    return {
+      enc: await crypto.subtle.importKey('raw', encBits, 'AES-GCM', true, ['decrypt']),
+      nameRaw: new Uint8Array(nameBits),
+      encRaw: new Uint8Array(encBits)
+    };
+  }
+  async function decrypt(blobBuf, key) {
+    var iv = new Uint8Array(blobBuf, 0, 12);
+    var tag = new Uint8Array(blobBuf, 12, 16);
+    var body = new Uint8Array(blobBuf, 28);
+    // additionalData must be ABSENT, not present-and-undefined (Chrome throws).
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv, tagLength: 128 },
+                                 key, concat(body, tag));
+  }
+
+  form.addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    var password = pw.value;
+    if (!password) return;
+    btn.disabled = true;
+    say('Memeriksa\u2026');
+    try {
+      if (!cfg) cfg = await (await fetch('./_enc/config.json', { cache: 'no-store' })).json();
+      var keys = await deriveKeys(password, unb64(cfg.salt), cfg.iterations);
+      var vres = await fetch('./_enc/' + cfg.verify, { cache: 'no-store' });
+      if (!vres.ok) throw new Error('net');
+      var plain = await decrypt(await vres.arrayBuffer(), keys.enc);
+      if (new TextDecoder().decode(plain) !== 'tka-ok') throw new Error('bad');
+
+      if (!('serviceWorker' in navigator)) throw new Error('nosw');
+      var payload = { enc: b64(keys.encRaw), name: b64(keys.nameRaw) };
+      sessionStorage.setItem('tka_k', JSON.stringify(payload));
+
+      await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      await navigator.serviceWorker.ready;
+
+      var sw = navigator.serviceWorker.controller;
+      if (!sw) {
+        say('Menyiapkan\u2026', 'ok');
+        sw = await new Promise(function (resolve) {
+          var done = false;
+          navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!done) { done = true; resolve(navigator.serviceWorker.controller); }
+          });
+          setTimeout(function () { if (!done) { done = true; resolve(navigator.serviceWorker.controller); } }, 8000);
+        });
+      }
+      if (!sw) throw new Error('nosw');
+
+      var acked = new Promise(function (resolve) {
+        navigator.serviceWorker.addEventListener('message', function onMsg(e) {
+          if (e.data && e.data.type === 'ready') {
+            navigator.serviceWorker.removeEventListener('message', onMsg);
+            resolve(true);
+          }
+        });
+      });
+      sw.postMessage({ type: 'key', enc: payload.enc, name: payload.name });
+      await Promise.race([acked, new Promise(function (r) { setTimeout(r, 3000); })]);
+
+      say('Terbuka. Mengalihkan\u2026', 'ok');
+      setTimeout(function () { location.replace('./s/index.html'); }, 120);
+    } catch (e) {
+      say(e && e.message === 'net'
+        ? 'Gagal menghubungi server. Periksa koneksi.'
+        : 'Kata sandi salah.', 'err');
+      btn.disabled = false;
+      pw.select();
+    }
+  });
+
+  if (sessionStorage.getItem('tka_k')) {
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).then(function () {
+      return navigator.serviceWorker.ready;
+    }).then(function () {
+      var k = JSON.parse(sessionStorage.getItem('tka_k'));
+      var sw = navigator.serviceWorker.controller;
+      if (sw) sw.postMessage({ type: 'key', enc: k.enc, name: k.name });
+      if (sessionStorage.getItem('tka_unlocked') === '1') location.replace('./s/index.html');
+    });
+  }
+})();
+</script>
+</body>
+</html>
