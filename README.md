@@ -6,6 +6,12 @@ Situs belajar untuk TKA (Tes Kemampuan Akademik) 2026 — empat mata pelajaran d
 
 ---
 
+## Tentang repositori ini
+
+Ini adalah **build publik** dari proyek pribadi. Riwayat commit di sini mengikuti tanggal pengerjaan aslinya (26 September – 24 Oktober 2026), tetapi isinya adalah hasil build terenkripsi pada tiap tanggal, bukan kode sumbernya.
+
+Kode sumber dan riwayat pengembangan lengkap tersimpan di repositori privat. Yang dipublikasikan di sini hanya hasil build yang sudah terenkripsi, supaya isi pelajaran tidak dapat dibaca tanpa kata sandi.
+
 ## Sekilas
 
 <table>
