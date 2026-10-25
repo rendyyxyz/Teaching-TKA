@@ -4,55 +4,329 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Akses Terbatas — Persiapan TKA SMA 2026</title>
+<title>Akses Terbatas: Persiapan TKA SMA 2026</title>
 <style>
-  :root { --green:#0b6b52; --green-dark:#085041; --ink:#16241f; --muted:#5b6b66; }
-  * { box-sizing:border-box; }
-  body { margin:0; min-height:100vh; display:grid; place-items:center;
-         font-family:Georgia,'Times New Roman',serif; color:var(--ink);
-         background:radial-gradient(circle at 30% 20%, #0e7d5f 0%, #085041 45%, #06382d 100%);
-         padding:24px; }
-  .card { width:100%; max-width:420px; background:#fbfaf6; border-radius:16px;
-          padding:34px 30px; box-shadow:0 24px 60px rgba(0,0,0,.35); }
-  h1 { margin:0 0 6px; font-size:1.5rem; letter-spacing:.2px; }
-  .sub { margin:0 0 24px; color:var(--muted); font-size:.9rem; line-height:1.5; }
-  label { display:block; font-size:.78rem; font-weight:700; text-transform:uppercase;
-          letter-spacing:.06em; color:var(--muted); margin-bottom:7px; }
-  input { width:100%; padding:13px 14px; font-size:1rem; font-family:inherit;
-          border:2px solid #d7ddd9; border-radius:10px; background:#fff; color:var(--ink); }
-  input:focus { outline:none; border-color:var(--green); }
-  .remember { display:flex; align-items:center; gap:8px; margin-top:14px;
-              font-size:.82rem; font-weight:400; text-transform:none;
-              letter-spacing:0; color:var(--ink); cursor:pointer; }
-  .remember input { width:auto; padding:0; margin:0; accent-color:var(--green); }
-  button { width:100%; margin-top:16px; padding:13px; font-size:1rem; font-weight:700;
-           font-family:inherit; color:#fff; background:var(--green); border:0;
-           border-radius:10px; cursor:pointer; transition:.15s; }
-  button:hover:not(:disabled) { background:var(--green-dark); }
-  button:disabled { opacity:.6; cursor:progress; }
-  .msg { margin-top:14px; font-size:.86rem; line-height:1.45; min-height:1.2em; }
-  .msg.err { color:#b3261e; }
-  .msg.ok { color:var(--green); }
-  .foot { margin-top:22px; padding-top:16px; border-top:1px solid #e6e8e4;
-          font-size:.74rem; color:var(--muted); line-height:1.5; }
+  /* ---------------------------------------------------------------------
+     Palette. Every pair measured with the WCAG formula; ratios inline.
+       ink       #2d3436 on #ffffff  12.68
+       secondary #5b6b66 on #ffffff   5.62
+       accent    #00695c on #ffffff   6.61  (button fill, focus ring)
+       white     on #00695c           6.61  (button label)
+       white     on #085041           9.40  (button hover)
+       error     #b3261e on #ffffff   6.54
+       border    #7a8a86 on #ffffff   3.62  (non-text floor 3.0)
+       page      #f1f4f3             decorative ground behind the sheet
+     The busy button is NEVER dimmed: opacity .6 measured 2.82:1.
+     --------------------------------------------------------------------- */
+  :root {
+    --ink: #2d3436;
+    --secondary: #5b6b66;
+    --accent: #00695c;
+    --accent-hover: #085041;
+    --error: #b3261e;
+    --border: #7a8a86;
+    --hair: #dfe3e2;
+    --page: #f1f4f3;
+    --sheet: #ffffff;
+    --sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --serif: Georgia, 'Times New Roman', serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--page);
+    font-family: var(--sans);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The sheet is the page's one surface. 1px hairline, no shadow: the border
+     is the only edge and it earns its place by separating two near-white
+     values (#ffffff on #f1f4f3 is 1.10:1, so a border is required, not
+     decorative). */
+  .sheet {
+    width: 100%;
+    max-width: 520px;
+    background: var(--sheet);
+    border: 1px solid var(--hair);
+    border-radius: 3px;
+    padding: 26px 30px 24px;
+  }
+
+  /* Four 4px bars, one per subject, in the colours the hub already uses.
+     aria-hidden: this is a legend for colour, and the subject names appear as
+     text directly below it, so nothing is carried by colour alone. */
+  .legend {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .legend span { height: 4px; flex: 1 1 0; border-radius: 1px; }
+  .legend .l1 { background: #00695c; }
+  .legend .l2 { background: #5b4bc4; }
+  .legend .l3 { background: #1e3a8a; }
+  .legend .l4 { background: #7c2d12; }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    margin: 0 0 14px;
+  }
+
+  .hair { height: 1px; background: var(--hair); margin: 0 0 16px; }
+  /* 16px above, matching the top hairline's 16px below, so the two rules sit
+     at the same distance from the content they separate. */
+  .hair.bottom { margin: 16px 0 14px; }
+
+  h1 {
+    margin: 0 0 16px;
+    font-family: var(--serif);
+    font-size: clamp(26px, 4.2vw, 34px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .subjects {
+    margin: 0 0 22px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--secondary);
+  }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--secondary);
+    margin-bottom: 8px;
+  }
+
+  /* 16px is the floor: below it iOS Safari zooms the viewport on focus and
+     pushes the sheet out of frame. Mono because a password is a value you
+     type, and mono makes a mistyped character visible. */
+  .field {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--ink);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: border-color 0.12s ease;
+  }
+  .field:hover { border-color: #5f736d; }
+  /* One composed focus treatment, not two. A text input matches :focus-visible
+     whenever it is focused, including autofocus and mouse clicks, so a border
+     rule plus an outline rule always rendered together as two concentric
+     green rings. Border (6.61:1) is the indicator; the halo is reinforcement. */
+  .field:focus,
+  .field:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.20);
+  }
+
+  .remember {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin: 6px 0 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .remember input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  /* Measured absent on the old page: a 13px box with no ring at all. */
+  .remember input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .unlock {
+    width: 100%;
+    height: 48px;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+  }
+  .unlock:hover:not(:disabled) { background: var(--accent-hover); }
+  .unlock:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  /* Busy keeps full contrast. Dimming it to .6 drops the label to 2.82:1. */
+  .unlock:disabled { cursor: progress; background: var(--accent-hover); }
+
+  /* ---------------------------------------------------------------------
+     The three-stage rule. Three segments, one per real phase of the code
+     path. It only appears while the page is working; the status line below
+     carries the same information as text, so the rule is aria-hidden.
+     --------------------------------------------------------------------- */
+  /* The progress block is removed from layout until the page starts working.
+     Measured 65px of dead space under the button at idle across all three
+     widths: the rule (3px) + gap (9px) + status min-height (19px) + the 14px
+     margin were all reserved before the user had submitted anything. The whole
+     block collapses, rather than the min-height shrinking, because the gap is
+     structural. syncProgress() flips data-on whenever the rule or the status
+     line has something to say. */
+  .progress {
+    margin-top: 14px;
+    display: none;
+  }
+  .progress[data-on="true"] { display: block; }
+
+  .rule {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-bottom: 9px;
+    visibility: hidden;
+  }
+  .rule[data-on="true"] { visibility: visible; }
+  .rule span {
+    height: 3px;
+    border-radius: 1px;
+    background: #e3e7e6;
+    transition: background-color 0.16s ease;
+  }
+  .rule span[data-done="true"] { background: var(--accent); }
+  .rule[data-failed="true"] span[data-done="true"] { background: var(--error); }
+
+  .status {
+    margin: 0;
+    min-height: 19px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--secondary);
+  }
+  .status[data-tone="ok"] { color: var(--accent); }
+  .status[data-tone="error"] { color: var(--error); }
+
+  .note {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--secondary);
+  }
+  .note strong { color: var(--ink); font-weight: 700; }
+
+  /* While auto-unlock runs there is no form: the page is reporting what it is
+     doing, not asking for input. */
+  .sheet[data-mode="auto"] .fields { display: none; }
+
+  /* Mobile: the sheet stops being a sheet. Border and ground drop, page and
+     document become one surface, and the block top-aligns so the on-screen
+     keyboard (about 40% of a phone) cannot push it under. */
+  @media (max-width: 560px) {
+    body {
+      align-items: flex-start;
+      padding: 22px 18px 32px;
+      background: var(--sheet);
+    }
+    .sheet {
+      max-width: 100%;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+  }
+
+  /* Windows high-contrast flattens backgrounds and borders; without this the
+     sheet edge, the field edge and the rule all disappear. */
+  @media (forced-colors: active) {
+    .sheet { border: 1px solid CanvasText; }
+    .field { border: 1px solid CanvasText; }
+    .legend span { forced-color-adjust: none; }
+    .rule span { border: 1px solid CanvasText; background: Canvas; }
+    .rule span[data-done="true"] { background: Highlight; }
+    .unlock { border: 1px solid ButtonText; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 </style>
 </head>
 <body>
-<form class="card" id="f" autocomplete="off">
-  <h1>Persiapan TKA SMA 2026</h1>
-  <p class="sub">Fisika, Matematika, Bahasa Inggris, Bahasa Indonesia. Masukkan kata sandi untuk membuka.</p>
-  <label for="pw">Kata sandi</label>
-  <input id="pw" type="password" autocomplete="current-password" autofocus required>
-  <label class="remember"><input id="remember" type="checkbox" checked>
-    Ingat di perangkat ini selama 30 hari</label>
-  <button id="go" type="submit">Buka</button>
-  <p class="msg" id="m"></p>
-  <div class="foot">
-    Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-GCM).
-    Tanpa kata sandi, berkasnya tidak dapat dibaca.<br>
-    Centang &ldquo;Ingat&rdquo; agar tidak perlu mengetik ulang setiap kali membuka.
-    Jangan centang bila perangkat ini dipakai orang lain.
+<form class="sheet" id="f" autocomplete="off" novalidate>
+  <div class="legend" aria-hidden="true">
+    <span class="l1"></span><span class="l2"></span><span class="l3"></span><span class="l4"></span>
   </div>
+
+  <p class="meta">TKA 2026 &middot; SMA</p>
+  <div class="hair" role="presentation"></div>
+
+  <h1>Persiapan TKA SMA 2026</h1>
+  <div class="hair" role="presentation"></div>
+
+  <p class="subjects">Fisika &middot; Matematika &middot; Bahasa Inggris &middot; Bahasa Indonesia</p>
+
+  <div class="fields">
+    <label class="field-label" for="pw">Kata sandi</label>
+    <input class="field" id="pw" type="password" autocomplete="current-password"
+           required aria-describedby="status" autofocus>
+
+    <label class="remember">
+      <input id="remember" type="checkbox" checked>
+      <span>Ingat di perangkat ini selama 30 hari</span>
+    </label>
+
+    <button class="unlock" id="go" type="submit">Buka</button>
+  </div>
+
+  <div class="progress">
+    <div class="rule" id="rule" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="hair bottom" role="presentation"></div>
+  <p class="note">
+    Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-GCM). Tanpa kata
+    sandi, berkasnya tidak dapat dibaca. Centang <strong>Ingat</strong> agar
+    tidak perlu mengetik ulang setiap kali membuka. Jangan centang bila
+    perangkat ini dipakai orang lain.
+  </p>
 </form>
 <script>
 (function () {
@@ -60,7 +334,9 @@
   var form = document.getElementById('f');
   var pw = document.getElementById('pw');
   var btn = document.getElementById('go');
-  var msg = document.getElementById('m');
+  var statusEl = document.getElementById('status');
+  var rule = document.getElementById('rule');
+  var segs = rule.querySelectorAll('span');
   var remember = document.getElementById('remember');
   var cfg = null;
 
@@ -99,7 +375,61 @@
     } catch (e) { /* private mode or quota: stay unlocked for this page only */ }
   }
 
-  function say(t, c) { msg.textContent = t; msg.className = 'msg ' + (c || ''); }
+  // ---- state reporting -------------------------------------------------
+  // The rule has three segments, one per real phase of the code path. Nothing
+  // here is on a timer: each call sits immediately before the await it
+  // describes, so the segment cannot claim progress the code has not made.
+  var STAGE = {
+    1: 'Menurunkan kunci dari kata sandi…',
+    2: 'Memeriksa kunci…',
+    3: 'Menyiapkan halaman…'
+  };
+
+  var progressEl = document.querySelector('.progress');
+
+  // The block opens as soon as there is anything to report, and closes again
+  // when both the rule and the status line are back to empty.
+  function syncProgress() {
+    var hasRule = rule.getAttribute('data-on') === 'true';
+    var hasText = (statusEl.textContent || '').trim() !== '';
+    progressEl.setAttribute('data-on', (hasRule || hasText) ? 'true' : 'false');
+  }
+
+  function paint(n, failed) {
+    for (var i = 0; i < segs.length; i++) {
+      segs[i].setAttribute('data-done', i < n ? 'true' : 'false');
+    }
+    rule.setAttribute('data-on', n > 0 ? 'true' : 'false');
+    rule.setAttribute('data-failed', failed ? 'true' : 'false');
+    syncProgress();
+  }
+
+  function say(text, tone) {
+    statusEl.textContent = text || '';
+    statusEl.setAttribute('data-tone', tone || '');
+    syncProgress();
+  }
+
+  function stage(n) {
+    paint(n, false);
+    say(STAGE[n], '');
+  }
+
+  function busy(on, label) {
+    btn.disabled = !!on;
+    if (label) btn.textContent = label;
+  }
+
+  function wrongField(isWrong) {
+    if (isWrong) {
+      pw.setAttribute('aria-invalid', 'true');
+      pw.style.borderColor = '#b3261e';
+    } else {
+      pw.removeAttribute('aria-invalid');
+      pw.style.borderColor = '';
+    }
+  }
+
   function b64(buf) {
     var b = new Uint8Array(buf), s = '';
     for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
@@ -131,6 +461,25 @@
       encRaw: new Uint8Array(encBits)
     };
   }
+  // Every fetch in the unlock path can fail for network reasons, and a bare
+  // rejection arrives as TypeError("Failed to fetch"), not as our own marker.
+  // Without this the catch below would report a dead connection as a wrong
+  // password. Measured: aborting ./_enc/config.json produced "Kata sandi
+  // salah." before this wrapper existed.
+  async function getJSON(url) {
+    var r;
+    try { r = await fetch(url, { cache: 'no-store' }); }
+    catch (e) { throw new Error('net'); }
+    if (!r.ok) throw new Error('net');
+    return r.json();
+  }
+  async function getBuf(url) {
+    var r;
+    try { r = await fetch(url, { cache: 'no-store' }); }
+    catch (e) { throw new Error('net'); }
+    if (!r.ok) throw new Error('net');
+    return r.arrayBuffer();
+  }
   async function decrypt(blobBuf, key) {
     var iv = new Uint8Array(blobBuf, 0, 12);
     var tag = new Uint8Array(blobBuf, 12, 16);
@@ -140,18 +489,31 @@
                                  key, concat(body, tag));
   }
 
+  // A wrong password sets a red border, aria-invalid and an error sentence.
+  // Those must clear the moment the user starts correcting it, or the page
+  // keeps telling them it is wrong while they are fixing it. God measured the
+  // state surviving a full retype. Clearing on input, not on submit.
+  pw.addEventListener('input', function () {
+    if (pw.getAttribute('aria-invalid') === 'true') {
+      wrongField(false);
+      paint(0, false);
+      say('');
+    }
+  });
+
   form.addEventListener('submit', async function (ev) {
     ev.preventDefault();
     var password = pw.value;
     if (!password) return;
-    btn.disabled = true;
-    say('Memeriksa\u2026');
+    wrongField(false);
+    busy(true, 'Membuka…');
+    stage(1);
     try {
-      if (!cfg) cfg = await (await fetch('./_enc/config.json', { cache: 'no-store' })).json();
+      if (!cfg) cfg = await getJSON('./_enc/config.json');
       var keys = await deriveKeys(password, unb64(cfg.salt), cfg.iterations);
-      var vres = await fetch('./_enc/' + cfg.verify, { cache: 'no-store' });
-      if (!vres.ok) throw new Error('net');
-      var plain = await decrypt(await vres.arrayBuffer(), keys.enc);
+
+      stage(2);
+      var plain = await decrypt(await getBuf('./_enc/' + cfg.verify), keys.enc);
       if (new TextDecoder().decode(plain) !== 'tka-ok') throw new Error('bad');
 
       if (!('serviceWorker' in navigator)) throw new Error('nosw');
@@ -159,18 +521,26 @@
       var persist = !remember || remember.checked;
       writeStore(payload, persist);
 
-      say('Menyiapkan\u2026', 'ok');
       var sw = await getController();
       if (!sw) throw new Error('nosw');
+      stage(3);
       await handoff(sw, payload);
 
-      say('Terbuka. Mengalihkan\u2026', 'ok');
+      paint(3, false);
+      say('Terbuka. Mengalihkan…', 'ok');
+      busy(true, 'Terbuka');
       setTimeout(function () { location.replace('./s/index.html'); }, 120);
     } catch (e) {
-      say(e && e.message === 'net'
+      // A network failure is thrown before stage 2 is ever painted, so it
+      // correctly reports one segment. A wrong password fails at the verifier
+      // decrypt, which is stage 2: two segments, never three.
+      var isNet = e && e.message === 'net';
+      paint(isNet ? 1 : 2, true);
+      say(isNet
         ? 'Gagal menghubungi server. Periksa koneksi.'
-        : 'Kata sandi salah.', 'err');
-      btn.disabled = false;
+        : 'Kata sandi salah. Coba lagi.', 'error');
+      busy(false, 'Buka');
+      if (!isNet) wrongField(true);
       pw.select();
     }
   });
@@ -210,11 +580,9 @@
   // 404s, and the student would have no way back to the password form.
   async function storedKeyWorks(k) {
     try {
-      if (!cfg) cfg = await (await fetch('./_enc/config.json', { cache: 'no-store' })).json();
+      if (!cfg) cfg = await getJSON('./_enc/config.json');
       var key = await crypto.subtle.importKey('raw', unb64(k.enc), 'AES-GCM', false, ['decrypt']);
-      var res = await fetch('./_enc/' + cfg.verify, { cache: 'no-store' });
-      if (!res.ok) return false;
-      var plain = await decrypt(await res.arrayBuffer(), key);
+      var plain = await decrypt(await getBuf('./_enc/' + cfg.verify), key);
       return new TextDecoder().decode(plain) === 'tka-ok';
     } catch (e) { return false; }
   }
@@ -223,10 +591,26 @@
     if (!('serviceWorker' in navigator)) return;
     var k = readStore();
     if (!k) return;
-    if (!(await storedKeyWorks(k))) { clearStore(); return; }
-    say('Membuka kembali\u2026', 'ok');
+    // A stored key exists, so the page is not going to ask for a password:
+    // switch to the reporting mode before the async verification starts, so
+    // the form never flashes on a returning visit.
+    form.setAttribute('data-mode', 'auto');
+    stage(1);
+    say('Membuka kembali…', 'ok');
+    if (!(await storedKeyWorks(k))) {
+      clearStore();
+      form.removeAttribute('data-mode');
+      paint(0, false);
+      say('');
+      return;
+    }
     var sw = await getController();
-    if (!sw) { say('', ''); return; }
+    if (!sw) {
+      form.removeAttribute('data-mode');
+      paint(0, false);
+      say('');
+      return;
+    }
     await handoff(sw, k);
     location.replace('./s/index.html');
   })();
