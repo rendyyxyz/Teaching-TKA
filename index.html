@@ -21,6 +21,10 @@
   input { width:100%; padding:13px 14px; font-size:1rem; font-family:inherit;
           border:2px solid #d7ddd9; border-radius:10px; background:#fff; color:var(--ink); }
   input:focus { outline:none; border-color:var(--green); }
+  .remember { display:flex; align-items:center; gap:8px; margin-top:14px;
+              font-size:.82rem; font-weight:400; text-transform:none;
+              letter-spacing:0; color:var(--ink); cursor:pointer; }
+  .remember input { width:auto; padding:0; margin:0; accent-color:var(--green); }
   button { width:100%; margin-top:16px; padding:13px; font-size:1rem; font-weight:700;
            font-family:inherit; color:#fff; background:var(--green); border:0;
            border-radius:10px; cursor:pointer; transition:.15s; }
@@ -39,11 +43,15 @@
   <p class="sub">Fisika, Matematika, Bahasa Inggris, Bahasa Indonesia. Masukkan kata sandi untuk membuka.</p>
   <label for="pw">Kata sandi</label>
   <input id="pw" type="password" autocomplete="current-password" autofocus required>
+  <label class="remember"><input id="remember" type="checkbox" checked>
+    Ingat di perangkat ini selama 30 hari</label>
   <button id="go" type="submit">Buka</button>
   <p class="msg" id="m"></p>
   <div class="foot">
-    Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-256-GCM).
-    Tanpa kata sandi, berkasnya tidak dapat dibaca.
+    Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-GCM).
+    Tanpa kata sandi, berkasnya tidak dapat dibaca.<br>
+    Centang &ldquo;Ingat&rdquo; agar tidak perlu mengetik ulang setiap kali membuka.
+    Jangan centang bila perangkat ini dipakai orang lain.
   </div>
 </form>
 <script>
@@ -53,7 +61,43 @@
   var pw = document.getElementById('pw');
   var btn = document.getElementById('go');
   var msg = document.getElementById('m');
+  var remember = document.getElementById('remember');
   var cfg = null;
+
+  // The unlock key must survive closing the browser, or the student loses their
+  // place in a tryout every time they step away. localStorage keeps it for 30
+  // days; the checkbox lets them opt out on a shared machine. The key is the
+  // derived AES key, not the password, so the plaintext password is never stored.
+  var STORE_KEY = 'tka_k';
+  var TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+  function clearStore() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+  }
+  function readStore() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY) || sessionStorage.getItem(STORE_KEY);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !o.enc || !o.name) return null;
+      if (o.exp && Date.now() > o.exp) { clearStore(); return null; }
+      return o;
+    } catch (e) { return null; }
+  }
+  function writeStore(payload, persist) {
+    var o = { enc: payload.enc, name: payload.name };
+    if (persist) o.exp = Date.now() + TTL_MS;
+    try {
+      if (persist) {
+        localStorage.setItem(STORE_KEY, JSON.stringify(o));
+        try { sessionStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+      } else {
+        sessionStorage.setItem(STORE_KEY, JSON.stringify(o));
+        try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+      }
+    } catch (e) { /* private mode or quota: stay unlocked for this page only */ }
+  }
 
   function say(t, c) { msg.textContent = t; msg.className = 'msg ' + (c || ''); }
   function b64(buf) {
@@ -112,34 +156,13 @@
 
       if (!('serviceWorker' in navigator)) throw new Error('nosw');
       var payload = { enc: b64(keys.encRaw), name: b64(keys.nameRaw) };
-      sessionStorage.setItem('tka_k', JSON.stringify(payload));
+      var persist = !remember || remember.checked;
+      writeStore(payload, persist);
 
-      await navigator.serviceWorker.register('./sw.js', { scope: './' });
-      await navigator.serviceWorker.ready;
-
-      var sw = navigator.serviceWorker.controller;
-      if (!sw) {
-        say('Menyiapkan\u2026', 'ok');
-        sw = await new Promise(function (resolve) {
-          var done = false;
-          navigator.serviceWorker.addEventListener('controllerchange', function () {
-            if (!done) { done = true; resolve(navigator.serviceWorker.controller); }
-          });
-          setTimeout(function () { if (!done) { done = true; resolve(navigator.serviceWorker.controller); } }, 8000);
-        });
-      }
+      say('Menyiapkan\u2026', 'ok');
+      var sw = await getController();
       if (!sw) throw new Error('nosw');
-
-      var acked = new Promise(function (resolve) {
-        navigator.serviceWorker.addEventListener('message', function onMsg(e) {
-          if (e.data && e.data.type === 'ready') {
-            navigator.serviceWorker.removeEventListener('message', onMsg);
-            resolve(true);
-          }
-        });
-      });
-      sw.postMessage({ type: 'key', enc: payload.enc, name: payload.name });
-      await Promise.race([acked, new Promise(function (r) { setTimeout(r, 3000); })]);
+      await handoff(sw, payload);
 
       say('Terbuka. Mengalihkan\u2026', 'ok');
       setTimeout(function () { location.replace('./s/index.html'); }, 120);
@@ -152,16 +175,61 @@
     }
   });
 
-  if (sessionStorage.getItem('tka_k')) {
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).then(function () {
-      return navigator.serviceWorker.ready;
-    }).then(function () {
-      var k = JSON.parse(sessionStorage.getItem('tka_k'));
-      var sw = navigator.serviceWorker.controller;
-      if (sw) sw.postMessage({ type: 'key', enc: k.enc, name: k.name });
-      if (sessionStorage.getItem('tka_unlocked') === '1') location.replace('./s/index.html');
+  // Hand the key to the worker and wait until it acknowledges, so the first
+  // fetch for /s/ cannot race the worker's key import and bounce back to login.
+  function handoff(sw, payload) {
+    return new Promise(function (resolve) {
+      var settled = false;
+      function finish() { if (!settled) { settled = true; resolve(true); } }
+      navigator.serviceWorker.addEventListener('message', function onMsg(e) {
+        if (e.data && e.data.type === 'ready') {
+          navigator.serviceWorker.removeEventListener('message', onMsg);
+          finish();
+        }
+      });
+      sw.postMessage({ type: 'key', enc: payload.enc, name: payload.name });
+      setTimeout(finish, 3000);
     });
   }
+
+  async function getController() {
+    await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    await navigator.serviceWorker.ready;
+    if (navigator.serviceWorker.controller) return navigator.serviceWorker.controller;
+    return await new Promise(function (resolve) {
+      var done = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (!done) { done = true; resolve(navigator.serviceWorker.controller); }
+      });
+      setTimeout(function () { if (!done) { done = true; resolve(navigator.serviceWorker.controller); } }, 8000);
+    });
+  }
+
+  // A stored key is only trusted after it actually decrypts the verifier. Without
+  // this, a stale or corrupt entry would redirect into a site where every page
+  // 404s, and the student would have no way back to the password form.
+  async function storedKeyWorks(k) {
+    try {
+      if (!cfg) cfg = await (await fetch('./_enc/config.json', { cache: 'no-store' })).json();
+      var key = await crypto.subtle.importKey('raw', unb64(k.enc), 'AES-GCM', false, ['decrypt']);
+      var res = await fetch('./_enc/' + cfg.verify, { cache: 'no-store' });
+      if (!res.ok) return false;
+      var plain = await decrypt(await res.arrayBuffer(), key);
+      return new TextDecoder().decode(plain) === 'tka-ok';
+    } catch (e) { return false; }
+  }
+
+  (async function autoUnlock() {
+    if (!('serviceWorker' in navigator)) return;
+    var k = readStore();
+    if (!k) return;
+    if (!(await storedKeyWorks(k))) { clearStore(); return; }
+    say('Membuka kembali\u2026', 'ok');
+    var sw = await getController();
+    if (!sw) { say('', ''); return; }
+    await handoff(sw, k);
+    location.replace('./s/index.html');
+  })();
 })();
 </script>
 </body>
