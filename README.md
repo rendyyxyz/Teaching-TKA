@@ -1,59 +1,88 @@
 # Persiapan TKA SMA 2026
 
-Situs belajar untuk TKA (Tes Kemampuan Akademik) 2026 — empat mata pelajaran dalam satu tempat: **Fisika, Matematika, Bahasa Inggris, dan Bahasa Indonesia**.
+Materi belajar untuk TKA (Tes Kemampuan Akademik) 2026, untuk siswa SMA yang
+mau latihan soal dengan pembahasan, bukan sekadar membaca rangkuman. Tiga mapel
+wajib (**Matematika, Bahasa Indonesia, Bahasa Inggris**) plus satu mapel pilihan
+(**Fisika**).
 
-**Situs:** https://rendyyxyz.github.io/Teaching-TKA/ — *terkunci, hubungi pemilik untuk akses.*
+**Situs:** https://rendyyxyz.github.io/Teaching-TKA/ · [minta akses lewat GitHub](https://github.com/rendyyxyz)
+
+Situsnya terkunci dengan kata sandi. Buka tautan profil di atas, lalu hubungi
+lewat GitHub atau buka issue di repositori ini.
+
+Yang membedakan halaman tryout Matematika: 25 dari 30 soalnya memakai angka yang
+dihasilkan generator, jadi kamu berlatih metodenya, bukan menghafal jawabannya.
+Angkanya tetap sama kalau halaman dimuat ulang, supaya pekerjaanmu tidak hilang
+saat tab tertutup. Tombol **"Ganti angka soal ini"** memberi variasi baru kapan
+pun kamu mau.
 
 ---
 
 ## Tentang repositori ini
 
-Ini adalah **build publik** dari proyek pribadi. Riwayat commit di sini mengikuti tanggal pengerjaan aslinya (26 September – 24 Oktober 2026), tetapi isinya adalah hasil build terenkripsi pada tiap tanggal, bukan kode sumbernya.
+Ini adalah **build publik** dari proyek pribadi. Riwayat commit di sini mengikuti
+tanggal pengerjaan aslinya, sejak 26 September 2026, tetapi isinya adalah hasil
+build terenkripsi pada tiap tanggal, bukan kode sumbernya.
 
-Kode sumber dan riwayat pengembangan lengkap tersimpan di repositori privat. Yang dipublikasikan di sini hanya hasil build yang sudah terenkripsi, supaya isi pelajaran tidak dapat dibaca tanpa kata sandi.
+Kode sumber dan riwayat pengembangan lengkap tersimpan di repositori privat. Yang
+dipublikasikan di sini hanya hasil build yang sudah terenkripsi, supaya isi
+pelajaran tidak dapat dibaca tanpa kata sandi.
 
 ## Sekilas
 
-<table>
-<tr>
-<td width="50%"><b>Halaman kunci</b><br><img src="docs/screenshots/01-lock.jpg" alt="Halaman kunci"></td>
-<td width="50%"><b>Hub — pilih mata pelajaran</b><br><img src="docs/screenshots/02-hub-desktop.jpg" alt="Hub"></td>
-</tr>
-</table>
+| Halaman kunci | Hub |
+|---|---|
+| ![Halaman kunci](docs/screenshots/01-lock.jpg) | ![Hub](docs/screenshots/02-hub-desktop.jpg) |
 
-> Tangkapan layar isi pelajaran sengaja tidak dipublikasikan di sini — situsnya terkunci dengan kata sandi, dan gambar isi pelajaran di repositori publik akan membuka apa yang seharusnya dilindungi.
+> Tangkapan layar isi pelajaran sengaja tidak dipublikasikan di sini. Situsnya
+> terkunci dengan kata sandi, dan gambar isi pelajaran di repositori publik akan
+> membuka apa yang seharusnya dilindungi.
 
 ---
 
 ## Isi
 
-| Mata pelajaran | Materi |
-|---|---|
-| **Fisika** | Kinematika, dinamika, termal, gelombang, optik, listrik |
-| **Matematika** | Bilangan, aljabar, geometri, trigonometri, data & peluang |
-| **Bahasa Inggris** | Reading comprehension, text types, grammar |
-| **Bahasa Indonesia** | Teks informasi & fiksi, gagasan utama, hubungan antarparagraf |
+| Mata pelajaran | Status | Materi |
+|---|---|---|
+| **Matematika** | Wajib | Bilangan, aljabar, geometri, trigonometri, data & peluang |
+| **Bahasa Indonesia** | Wajib | Teks informasi & fiksi, gagasan utama, hubungan antarparagraf |
+| **Bahasa Inggris** | Wajib | Reading comprehension, text types, grammar |
+| **Fisika** | Pilihan | Kinematika, dinamika, termal, gelombang, optik, listrik |
 
-Setiap mapel punya materi bertahap, bank soal, dan latihan dengan pembahasan.
+Tiap mapel punya materi bertahap, bank soal, dan latihan dengan pembahasan per
+soal.
 
 ## Mesin tryout
 
-Halaman tryout Matematika memuat 30 soal; 25 di antaranya **diregenerasi setiap kali dimuat** dengan angka baru, dan pembahasannya ikut dihitung ulang. Tujuannya supaya yang dilatih adalah metodenya, bukan hafalan jawaban.
+Halaman tryout Matematika memuat 30 soal. 25 di antaranya memakai angka baru dari
+generator, dan pembahasannya ikut dihitung ulang dari angka yang sama, jadi
+langkah penyelesaiannya selalu cocok dengan soalnya.
 
-Ada juga tombol **"Ganti angka soal ini"** per soal, sehingga satu soal bisa diulang tanpa kehilangan jawaban soal lain.
+Angka itu diambil dari seed acak yang disimpan di browser. Muat ulang halaman dan
+papernya tetap sama, supaya kamu bisa berhenti di tengah tryout untuk menghitung
+di kertas lalu melanjutkan tanpa kehilangan posisi. Tombol **"Ganti angka soal
+ini"** di tiap soal memberi variasi baru tanpa mengubah soal lain.
+
+Lima soal sisanya sengaja tidak diacak (soal 14 sampai 18). Semuanya soal
+geometri dan bangun ruang yang bergantung pada gambar, dan gambarnya itu sendiri
+adalah pertanyaannya.
 
 ## Keamanan
 
-Seluruh isi situs disimpan **terenkripsi** (AES-256-GCM). Kunci diturunkan dari kata sandi memakai PBKDF2-SHA256 dengan 1.000.000 iterasi. Nama berkas pun di-hash, sehingga struktur situs tidak terlihat dari repositori.
+Repositori publik ini memuat materi belajar privat, dan enkripsi adalah cara
+materinya tetap privat meski repositorinya terbuka. Tanpa kata sandi, isi
+repositori hanya berupa ciphertext.
 
-Tanpa kata sandi, isi repositori ini hanya berupa ciphertext dan tidak dapat dibaca.
-
-## Teknologi
-
-HTML, CSS, dan JavaScript murni. Tanpa framework, tanpa backend, tanpa dependensi npm. Dekripsi dilakukan di browser oleh service worker, sehingga tidak ada server yang perlu dijalankan.
+Rinciannya, kalau kamu ingin memeriksa: isi situs dienkripsi AES-256-GCM, kunci
+diturunkan dari kata sandi dengan PBKDF2-SHA256 sebanyak 1.000.000 iterasi, dan
+nama berkas isi di-hash sehingga daftar halamannya tidak terbaca dari repositori.
+Dekripsi dilakukan di browser oleh service worker, jadi tidak ada server yang
+perlu dijalankan. Seluruhnya HTML, CSS, dan JavaScript murni, tanpa framework
+dan tanpa dependensi npm.
 
 ## Lisensi
 
-Hak cipta dilindungi. Lihat [LICENSE](LICENSE).
+Hak cipta dilindungi, lihat [LICENSE](LICENSE).
 
-Soal-soal pada halaman tryout Matematika diturunkan dari kertas ujian **TO-1 TKA Mapel Wajib — PROSUS INTEN (TA 2025/2026)** dan tetap menjadi milik penerbitnya.
+Soal-soal pada halaman tryout Matematika diturunkan dari kertas ujian **TO-1 TKA
+Mapel Wajib, PROSUS INTEN (TA 2025/2026)** dan tetap menjadi milik penerbitnya.
