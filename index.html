@@ -4,301 +4,308 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Halaman masuk untuk materi belajar TKA 2026: Matematika, Bahasa Indonesia, Bahasa Inggris, dan Fisika.">
 <title>Akses Terbatas: Persiapan TKA SMA 2026</title>
 <style>
-  /* ---------------------------------------------------------------------
-     Palette. Every pair measured with the WCAG formula; ratios inline.
-       ink       #2d3436 on #ffffff  12.68
-       secondary #5b6b66 on #ffffff   5.62
-       accent    #00695c on #ffffff   6.61  (button fill, focus ring)
-       white     on #00695c           6.61  (button label)
-       white     on #085041           9.40  (button hover)
-       error     #b3261e on #ffffff   6.54
-       border    #7a8a86 on #ffffff   3.62  (non-text floor 3.0)
-       page      #f1f4f3             decorative ground behind the sheet
-     The busy button is NEVER dimmed: opacity .6 measured 2.82:1.
-     --------------------------------------------------------------------- */
-  :root {
-    --ink: #2d3436;
-    --secondary: #5b6b66;
-    --accent: #00695c;
-    --accent-hover: #085041;
-    --error: #b3261e;
-    --border: #7a8a86;
-    --hair: #dfe3e2;
-    --page: #f1f4f3;
-    --sheet: #ffffff;
-    --sans: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    --serif: Georgia, 'Times New Roman', serif;
-    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-  }
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: P, a gate is a small page; the argument is that the cover of an exam booklet is the one object every student in this country already knows how to read, so the page borrows its proportions instead of inventing a login card */
+/* Hallmark · direction: the page is the object · an Indonesian exam-booklet cover becomes the gate */
+/* Hallmark · surface: absolute · paper resolves to #fbfcfa, tinted toward the green anchor · the sheet is read as exam paper, and pure white reads as a screen */
+:root {
+  /* Paper and ground: two stones, both tinted toward the green anchor so
+     nothing on this page resolves to a pure absolute. */
+  --paper:      #fbfcfa;
+  --ground:     #eef2f0;
+  --hair:       #dbe2de;
+  --hair-soft:  #e8eeeb;
 
-  * { box-sizing: border-box; }
+  /* Ink. Measured on --paper: 14.1:1 and 6.0:1. */
+  --ink:        #1f2a27;
+  --muted:      #55635f;
 
-  html { -webkit-text-size-adjust: 100%; }
+  /* One accent. 6.3:1 on paper, 8.9:1 as hover, 6.3:1 white-on-accent. */
+  --accent:     #00695c;
+  --accent-hover: #085041;
+  --on-accent:  #fbfcfa;
 
+  /* Error. 7.1:1 on paper. */
+  --error:      #a3231c;
+
+  /* Focus halos, tinted from their own hue rather than a neutral grey. */
+  --halo:       rgba(0, 105, 92, 0.22);
+  --halo-error: rgba(163, 35, 28, 0.22);
+
+  /* The four subject marks, taken from the hub so the legend is the same
+     colour language the student meets one page later. */
+  --mark-1:     #00695c;
+  --mark-2:     #5b4bc4;
+  --mark-3:     #1e3a8a;
+  --mark-4:     #7c2d12;
+
+  /* Type. No webfont: this page loads before anything is decrypted, so it
+     must make zero network requests. */
+  --serif: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+  --sans:  'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Spacing on a 4px scale, used without exception. */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s7: 28px; --s8: 32px;
+  --s10: 40px; --s12: 48px; --s14: 56px; --s16: 64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: clip; -webkit-text-size-adjust: 100%; }
+body { overflow-x: clip; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s6);
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The sheet is the page's only surface. A hairline, not a shadow: the paper
+   sits on the ground by value, and a shadow would claim an elevation that
+   means nothing on a single-sheet page. */
+.sheet {
+  width: 100%;
+  max-width: 520px;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  padding: var(--s8) var(--s8) var(--s7);
+}
+
+/* Four marks, one per subject, in the order the hub uses. aria-hidden: the
+   subject names are written out below, so nothing is carried by colour. */
+.legend {
+  display: flex;
+  gap: var(--s1);
+  margin-bottom: var(--s6);
+}
+.legend span { flex: 1 1 0; height: 4px; }
+.legend .m1 { background: var(--mark-1); }
+.legend .m2 { background: var(--mark-2); }
+.legend .m3 { background: var(--mark-3); }
+.legend .m4 { background: var(--mark-4); }
+
+.hair { height: 1px; background: var(--hair); margin: 0 0 var(--s5); }
+
+h1 {
+  margin: 0 0 var(--s5);
+  font-family: var(--serif);
+  font-size: clamp(30px, 5.2vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* The four subjects as a ruled two-by-two block, the way a booklet lists what
+   is inside. Not a dot-joined string: each name owns its cell. */
+.subjects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s2) var(--s4);
+  margin: 0 0 var(--s10);
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.subjects li { display: flex; align-items: baseline; gap: var(--s2); min-width: 0; }
+.subjects li::before {
+  content: '';
+  flex: none;
+  width: 8px; height: 2px;
+  background: var(--hair);
+}
+.subjects li:nth-child(1)::before { background: var(--mark-1); }
+.subjects li:nth-child(2)::before { background: var(--mark-2); }
+.subjects li:nth-child(3)::before { background: var(--mark-3); }
+.subjects li:nth-child(4)::before { background: var(--mark-4); }
+
+label.field-label {
+  display: block;
+  margin-bottom: var(--s2);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+/* 16px floor: below it iOS Safari zooms the viewport on focus and pushes the
+   sheet out of frame. Mono so a mistyped character is visible in a masked
+   field. */
+.field {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--s4);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--muted);
+  border-radius: 2px;
+  transition: border-color 120ms ease;
+}
+.field:hover { border-color: var(--ink); }
+/* One composed focus treatment. A text input matches :focus-visible whenever
+   it is focused, so a border rule plus an outline rule render as two
+   concentric rings. Border is the indicator; the halo reinforces it. */
+.field:focus { outline: none; border-color: var(--accent); }
+.field:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+.field[aria-invalid="true"] { border-color: var(--error); }
+.field[aria-invalid="true"]:focus-visible { outline-color: var(--error); }
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: 48px;
+  margin: var(--s2) 0 var(--s5);
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink);
+  cursor: pointer;
+}
+.remember input {
+  flex: none;
+  width: 20px; height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.remember input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.unlock {
+  display: block;
+  width: 100%;
+  height: 48px;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+.unlock:hover:not(:disabled) { background: var(--accent-hover); }
+.unlock:active:not(:disabled) { background: var(--accent-hover); }
+.unlock:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Busy keeps full contrast. Dimming to .6 drops the label to 2.82:1. */
+.unlock:disabled { cursor: progress; background: var(--accent-hover); }
+
+/* The three-stage rule. One segment per real phase of the unlock path, so a
+   one-to-two second PBKDF2 wait reads as work rather than a freeze. Hidden
+   until there is something to report; the status line carries the same
+   information as text, so the rule is aria-hidden. */
+.progress { display: none; margin-top: var(--s5); }
+.progress[data-on="true"] { display: block; }
+
+.rule {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s1);
+  margin-bottom: var(--s3);
+}
+.rule span {
+  height: 3px;
+  background: var(--hair-soft);
+  transition: background-color 160ms ease;
+}
+.rule span[data-done="true"] { background: var(--accent); }
+.rule[data-failed="true"] span[data-done="true"] { background: var(--error); }
+
+.status {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.status[data-tone="ok"] { color: var(--accent); }
+.status[data-tone="error"] { color: var(--error); }
+
+.note {
+  margin: var(--s7) 0 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.note strong { color: var(--ink); font-weight: 600; }
+
+.sheet[data-mode="auto"] .fields { display: none; }
+
+/* Mobile: the sheet stops being a sheet. Border and ground drop and the page
+   and the document become one surface. Top-aligned, because the on-screen
+   keyboard takes roughly 40% of a phone and a centred block would sit under
+   it. */
+@media (max-width: 560px) {
   body {
-    margin: 0;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: var(--page);
-    font-family: var(--sans);
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* The sheet is the page's one surface. 1px hairline, no shadow: the border
-     is the only edge and it earns its place by separating two near-white
-     values (#ffffff on #f1f4f3 is 1.10:1, so a border is required, not
-     decorative). */
-  .sheet {
-    width: 100%;
-    max-width: 520px;
-    background: var(--sheet);
-    border: 1px solid var(--hair);
-    border-radius: 3px;
-    padding: 26px 30px 24px;
-  }
-
-  /* Four 4px bars, one per subject, in the colours the hub already uses.
-     aria-hidden: this is a legend for colour, and the subject names appear as
-     text directly below it, so nothing is carried by colour alone. */
-  .legend {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 18px;
-  }
-  .legend span { height: 4px; flex: 1 1 0; border-radius: 1px; }
-  .legend .l1 { background: #00695c; }
-  .legend .l2 { background: #5b4bc4; }
-  .legend .l3 { background: #1e3a8a; }
-  .legend .l4 { background: #7c2d12; }
-
-  .meta {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin: 0 0 14px;
-  }
-
-  .hair { height: 1px; background: var(--hair); margin: 0 0 16px; }
-  /* 16px above, matching the top hairline's 16px below, so the two rules sit
-     at the same distance from the content they separate. */
-  .hair.bottom { margin: 16px 0 14px; }
-
-  h1 {
-    margin: 0 0 16px;
-    font-family: var(--serif);
-    font-size: clamp(26px, 4.2vw, 34px);
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-  }
-
-  .subjects {
-    margin: 0 0 22px;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--secondary);
-  }
-
-  label.field-label {
     display: block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--secondary);
-    margin-bottom: 8px;
+    padding: var(--s6) var(--s5) var(--s8);
+    background: var(--paper);
   }
-
-  /* 16px is the floor: below it iOS Safari zooms the viewport on focus and
-     pushes the sheet out of frame. Mono because a password is a value you
-     type, and mono makes a mistyped character visible. */
-  .field {
-    width: 100%;
-    height: 48px;
-    padding: 0 14px;
-    font-family: var(--mono);
-    font-size: 16px;
-    color: var(--ink);
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    transition: border-color 0.12s ease;
-  }
-  .field:hover { border-color: #5f736d; }
-  /* One composed focus treatment, not two. A text input matches :focus-visible
-     whenever it is focused, including autofocus and mouse clicks, so a border
-     rule plus an outline rule always rendered together as two concentric
-     green rings. Border (6.61:1) is the indicator; the halo is reinforcement. */
-  .field:focus,
-  .field:focus-visible {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.20);
-  }
-
-  .remember {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    margin: 6px 0 12px;
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--ink);
-    cursor: pointer;
-  }
-  .remember input {
-    flex: none;
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    accent-color: var(--accent);
-    cursor: pointer;
-  }
-  /* Measured absent on the old page: a 13px box with no ring at all. */
-  .remember input:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .unlock {
-    width: 100%;
-    height: 48px;
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 700;
-    color: #ffffff;
-    background: var(--accent);
+  .sheet {
+    max-width: 100%;
     border: 0;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: background-color 0.12s ease;
+    padding: 0;
   }
-  .unlock:hover:not(:disabled) { background: var(--accent-hover); }
-  .unlock:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-  /* Busy keeps full contrast. Dimming it to .6 drops the label to 2.82:1. */
-  .unlock:disabled { cursor: progress; background: var(--accent-hover); }
+  .subjects { grid-template-columns: minmax(0, 1fr); }
+}
 
-  /* ---------------------------------------------------------------------
-     The three-stage rule. Three segments, one per real phase of the code
-     path. It only appears while the page is working; the status line below
-     carries the same information as text, so the rule is aria-hidden.
-     --------------------------------------------------------------------- */
-  /* The progress block is removed from layout until the page starts working.
-     Measured 65px of dead space under the button at idle across all three
-     widths: the rule (3px) + gap (9px) + status min-height (19px) + the 14px
-     margin were all reserved before the user had submitted anything. The whole
-     block collapses, rather than the min-height shrinking, because the gap is
-     structural. syncProgress() flips data-on whenever the rule or the status
-     line has something to say. */
-  .progress {
-    margin-top: 14px;
-    display: none;
-  }
-  .progress[data-on="true"] { display: block; }
+@media (forced-colors: active) {
+  .sheet { border: 1px solid CanvasText; }
+  .field { border: 1px solid CanvasText; }
+  .legend span, .subjects li::before { forced-color-adjust: none; }
+  .rule span { border: 1px solid CanvasText; background: Canvas; }
+  .rule span[data-done="true"] { background: Highlight; }
+  .unlock { border: 1px solid ButtonText; }
+}
 
-  .rule {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    margin-bottom: 9px;
-    visibility: hidden;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001ms !important;
   }
-  .rule[data-on="true"] { visibility: visible; }
-  .rule span {
-    height: 3px;
-    border-radius: 1px;
-    background: #e3e7e6;
-    transition: background-color 0.16s ease;
-  }
-  .rule span[data-done="true"] { background: var(--accent); }
-  .rule[data-failed="true"] span[data-done="true"] { background: var(--error); }
-
-  .status {
-    margin: 0;
-    min-height: 19px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--secondary);
-  }
-  .status[data-tone="ok"] { color: var(--accent); }
-  .status[data-tone="error"] { color: var(--error); }
-
-  .note {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.55;
-    color: var(--secondary);
-  }
-  .note strong { color: var(--ink); font-weight: 700; }
-
-  /* While auto-unlock runs there is no form: the page is reporting what it is
-     doing, not asking for input. */
-  .sheet[data-mode="auto"] .fields { display: none; }
-
-  /* Mobile: the sheet stops being a sheet. Border and ground drop, page and
-     document become one surface, and the block top-aligns so the on-screen
-     keyboard (about 40% of a phone) cannot push it under. */
-  @media (max-width: 560px) {
-    body {
-      align-items: flex-start;
-      padding: 22px 18px 32px;
-      background: var(--sheet);
-    }
-    .sheet {
-      max-width: 100%;
-      border: 0;
-      border-radius: 0;
-      padding: 0;
-    }
-  }
-
-  /* Windows high-contrast flattens backgrounds and borders; without this the
-     sheet edge, the field edge and the rule all disappear. */
-  @media (forced-colors: active) {
-    .sheet { border: 1px solid CanvasText; }
-    .field { border: 1px solid CanvasText; }
-    .legend span { forced-color-adjust: none; }
-    .rule span { border: 1px solid CanvasText; background: Canvas; }
-    .rule span[data-done="true"] { background: Highlight; }
-    .unlock { border: 1px solid ButtonText; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.001ms !important;
-      animation-delay: 0s !important;
-      transition-duration: 0.001ms !important;
-    }
-  }
+}
 </style>
 </head>
 <body>
 <form class="sheet" id="f" autocomplete="off" novalidate>
   <div class="legend" aria-hidden="true">
-    <span class="l1"></span><span class="l2"></span><span class="l3"></span><span class="l4"></span>
+    <span class="m1"></span><span class="m2"></span><span class="m3"></span><span class="m4"></span>
   </div>
-
-  <p class="meta">TKA 2026 &middot; SMA</p>
-  <div class="hair" role="presentation"></div>
 
   <h1>Persiapan TKA SMA 2026</h1>
   <div class="hair" role="presentation"></div>
 
-  <p class="subjects">Fisika &middot; Matematika &middot; Bahasa Inggris &middot; Bahasa Indonesia</p>
+  <ul class="subjects">
+    <li>Matematika</li>
+    <li>Bahasa Indonesia</li>
+    <li>Bahasa Inggris</li>
+    <li>Fisika</li>
+  </ul>
 
   <div class="fields">
     <label class="field-label" for="pw">Kata sandi</label>
@@ -320,7 +327,6 @@
     <p class="status" id="status" role="status" aria-live="polite"></p>
   </div>
 
-  <div class="hair bottom" role="presentation"></div>
   <p class="note">
     Seluruh isi situs tersimpan dalam bentuk terenkripsi (AES-GCM). Tanpa kata
     sandi, berkasnya tidak dapat dibaca. Centang <strong>Ingat</strong> agar
